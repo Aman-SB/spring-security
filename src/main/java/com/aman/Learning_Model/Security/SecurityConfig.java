@@ -26,7 +26,10 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((requests) -> requests.anyRequest().authenticated());
+
+        http.authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/h2-console/**").permitAll()
+                .anyRequest().authenticated());
 //any reqest the application get authenticated by default
 
         http.sessionManagement(session ->
@@ -36,6 +39,12 @@ public class SecurityConfig {
 //        http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
 //        basic authenticate to spring security
+
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+        // to enables the frame in the h2-console database
+
+        http.csrf(csrf -> csrf.disable());
+        // disable csrf for not authentication
         return http.build();
     }
 
